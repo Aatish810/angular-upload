@@ -10,58 +10,72 @@ import * as lodash from 'lodash';
 })
 export class AppComponent implements OnInit {
   title = 'ignite-test';
-  private filesControl = new FormControl(null, FileUploadValidators.filesLimit(5));
+  private filesControl = new FormControl(null, FileUploadValidators.accept(['file_extension']));
   public demoForm: FormGroup;
-  public copyArray = [];
+  public invalidFileSizeDetail = [];
+  public invalidFileFormatDetail = [];
 
   constructor(private formBuilder: FormBuilder) {
   }
 
-    ngOnInit() {
-      this.demoForm = this.formBuilder.group({
-        files: this.filesControl
+  ngOnInit() {
+    this.demoForm = this.formBuilder.group({
+      files: this.filesControl
     });
     this.onChanges()
-    }
+  }
 
-    onChanges() {
-      this.demoForm.get('files').valueChanges.subscribe(() => {
-        let count = 0;
-        for(let file of this.demoForm.get('files').value) {
-          if(file.name) {
-            let fileExtn = this.getFileExtension(file.name)
-            if(fileExtn!='png' && fileExtn != 'jpg' && fileExtn != 'pdf' ) {
-              this.removeInValidFile(file);
-              alert('not a valid file');
-              return;
-            }
-          }
-         let fileSize = file.size/1024/1024;
-         if(fileSize > 5) {
-           this.removeInValidFile(file);
-           alert('only 5 MB is allowed');
-           return;
-         } 
-        }
-        if(this.demoForm.get('files').value.length >= 5) {
-          this.demoForm.disable();
-        }
-      });
-    }
+  onChanges() {
+    // this.demoForm.get('files').valueChanges.subscribe(() => {
+    //   let count = 0;
+    //   for (let file of this.demoForm.get('files').value) {
+    //     if (file.name) {
+    //       let fileExtn = this.getFileExtension(file.name);
+    //       // checking file format
+    //       if (fileExtn != 'png' && fileExtn != 'jpg' && fileExtn != 'pdf') {
+    //         if (!lodash.includes(this.invalidFileFormatDetail, file.name)) {
+    //           this.invalidFileFormatDetail.push(file.name);
+    //           alert('not a valid file');
+    //         }
+    //         this.removeInValidFile(file);
+    //       } else {
+    //       // checking file size
+    //       let fileSize = file.size / 1024 / 1024;
+    //       if (fileSize > 5) {
+    //         console.log(lodash.includes(this.invalidFileSizeDetail, file.name))
+    //         if (!lodash.includes(this.invalidFileSizeDetail, file.name)) {
+    //           this.invalidFileSizeDetail.push(file.name);
+    //           alert('only 5 MB is allowed');
+    //         }
+    //         this.removeInValidFile(file);
+    //       }
+    //       }
+    //     }
+    //     if (this.demoForm.get('files').value.length >= 5) {
+    //       this.demoForm.disable();
+    //     }
+    //   }
 
-    removeInValidFile(file) {
+    // });
+  }
+
+  removeInValidFile(file) {
+    if (this.demoForm.value.files === null) {
+      this.filesControl.setValue([]);
+    } else {
       lodash.remove(this.demoForm.get('files').value, (f) => {
         return f.name === file.name;
       });
     }
+  }
 
-    getFileExtension(name) {
-      return name.split('.')[1];
-    }
+  getFileExtension(name) {
+    return name.split('.')[1];
+  }
 
-    uploadFilesToDb() {
-      this.filesControl.setValue([]);
-      console.log(this.demoForm.value.files)
-    }
- 
+  uploadFilesToDb() {
+    console.log(this.demoForm.value.files);
+    this.filesControl.setValue([]);
+  }
+
 }
