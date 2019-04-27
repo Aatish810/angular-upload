@@ -1,3 +1,4 @@
-<p>
-  template-test works!
-</p>
+<form #demoForm="ngForm">
+  <file-upload [(ngModel)]="uploadedFiles" [disabled]="isDisabled" name="files"></file-upload>
+  <button type="button" (click)= "uploadFilesNow()">Upload</button>
+</form>
